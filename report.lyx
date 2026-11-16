@@ -1,0 +1,1084 @@
+#LyX 2.5 created this file. For more info see https://www.lyx.org/
+\lyxformat 643
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass apart-sprint
+\begin_preamble
+% The template's design is in apart-sprint.cls (Apart sprint kit, see
+% its README.md).  LaTeX added here adjusts it, for example:
+% \setlength\apartauthorwidth{2in}  % wider author columns
+\end_preamble
+\use_default_options true
+\maintain_unincluded_children no
+\language british
+\language_package auto
+\inputencoding utf8
+\fontencoding default
+\font_roman "default" "default"
+\font_sans "default" "Arial"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts true
+\font_sc false
+\font_roman_osf false
+\font_sans_osf false
+\font_typewriter_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\font_cjk goth
+\use_microtype true
+\use_dash_ligatures true
+\graphics default
+\default_output_format pdf5
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize 11
+\spacing single
+\use_hyperref true
+\pdf_subject "Submission to the AI x Epistemics Research Sprint (Apart Research), November 2026"
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder true
+\pdf_colorlinks true
+\pdf_backref false
+\pdf_pdfusetitle true
+\pdf_quoted_options "linkcolor=apartlink,citecolor=apartlink,urlcolor=apartlink"
+\papersize letter
+\use_geometry true
+\use_package amsmath 2
+\use_package amssymb 0
+\use_package cancel 1
+\use_package esint 0
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 0
+\use_package undertilde 1
+\cite_engine biblatex
+\cite_engine_type authoryear
+\biblio_style authoryear
+\biblio_options backend=biber
+\biblatex_bibstyle authoryear
+\biblatex_citestyle authoryear
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification false
+\crossref_package cleveref
+\use_formatted_ref 0
+\use_minted 0
+\use_lineno 0
+\backgroundcolor none
+\fontcolor none
+\notefontcolor lightgray
+\boxbgcolor red
+\table_border_color default
+\table_odd_row_color default
+\table_even_row_color default
+\table_alt_row_colors_start 1
+\branch Guidance
+\selected 1
+\filename_suffix 0
+\color #fff2cc #4a3f1d
+\end_branch
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 1in
+\topmargin 1in
+\rightmargin 1in
+\bottommargin 1in
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation skip
+\defskip 15.75pt
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style british
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle empty
+\tablestyle default
+\bulletLaTeX 0 "-"
+\bulletLaTeX 1 "-"
+\tracking_changes false
+\output_changes false
+\change_bars false
+\postpone_fragile_content false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\docbook_table_output 0
+\docbook_mathml_prefix 1
+\docbook_mathml_version 0
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+
+\series bold
+Using this template
+\series default
+ (this note never prints in the PDF)
+\end_layout
+
+\begin_layout Plain Layout
+
+\series bold
+New sprint:
+
+\series default
+ the footnote in the title holds the sprint's name,
+ linked to its web page,
+ and the month:
+ click the link to change the name and the URL,
+ then edit the month.
+ Change the name and the month in Document > Settings > PDF Properties > Subject too.
+ The kit's new-report.sh does all of this,
+ and copies the template and library.bib into the project folder.
+\end_layout
+
+\begin_layout Plain Layout
+
+\series bold
+New from Template:
+
+\series default
+ close all other documents first.
+ LyX makes the new document in the folder of the document that is open,
+ and if that folder has a library.bib,
+ Save As keeps the bibliography pointing to it (as ../old-folder/library) instead of the library.bib beside the new report.
+ After saving,
+ click the bibliography inset under References:
+ its Selected database must be just library.
+ If it is not,
+ Delete it there and Add Local...
+ the library.bib in the report's folder.
+\end_layout
+
+\begin_layout Plain Layout
+
+\series bold
+Guidance:
+
+\series default
+ every instruction from the official template,
+ including the yellow info box,
+ sits in a Guidance branch inset (shown in the branch colour:
+ pale yellow,
+ or dark olive in a dark theme).
+ Document > Settings > Branches > Guidance > (De)activate removes all of it from the PDF at once;
+ it stays visible here for reference.
+ Write your own text outside those insets:
+ click in the empty space just after an inset (on the line below a long inset;
+ anywhere to the right of a one-line inset),
+ which puts the cursor before the red paragraph-break mark that follows the inset,
+ and type.
+ That text starts a new paragraph whether the guidance is printed or not;
+ press Enter there for further paragraphs.
+\end_layout
+
+\begin_layout Plain Layout
+
+\series bold
+Authors:
+
+\series default
+ one Author paragraph per author,
+ with the affiliation in its Affiliation inset;
+ the PDF sets them three per row.
+ To add an author,
+ copy and paste an Author paragraph,
+ or press Enter and pick the Author style:
+ the cursor then starts inside the new Affiliation inset,
+ so type the affiliation,
+ press the Right arrow key and type the name.
+ Delete the paragraph to remove an author.
+ The PDF title and author metadata are taken from here.
+\end_layout
+
+\begin_layout Plain Layout
+
+\series bold
+Citations:
+
+\series default
+ Insert > Citation,
+ from library.bib in this folder (Zotero with Better BibTeX:
+ auto-export in Better BibLaTeX format to that file).
+ The reference list prints under References.
+\end_layout
+
+\begin_layout Plain Layout
+
+\series bold
+Styles:
+
+\series default
+ Lettered gives (a),
+ (b) lists;
+ Indented gives the indented block of the Tips;
+ Insert > Custom Inset > Info Box gives the yellow box.
+ Export with File > Export > PDF (LuaTeX).
+\end_layout
+
+\begin_layout Plain Layout
+
+\series bold
+Kit:
+
+\series default
+ the layout comes from apart-sprint.cls and apart-sprint.layout in the Apart sprint kit (installed with its install.sh;
+ its README.md explains the template).
+ A co-author needs the kit too,
+ or the LaTeX export with the .cls beside it.
+ If LyX ever says that the layout file apart-sprint could not be found,
+ close the document and choose Discard,
+ not Save (and do not recover an emergency save),
+ then install the kit:
+ saving it then would damage the document.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Title
+PROJECT TITLE
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Research conducted at the 
+\begin_inset CommandInset href
+LatexCommand href
+name "AI x Epistemics Research Sprint"
+target "https://apartresearch.com/sprints/ai-x-epistemics-research-sprint-2026-11-13-to-2026-11-15"
+literal "false"
+
+\end_inset
+
+,
+ November 2026
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Author
+Author name 1
+\begin_inset Argument post:1
+status open
+
+\begin_layout Plain Layout
+Affiliation
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Author
+Author name 2
+\begin_inset Argument post:1
+status open
+
+\begin_layout Plain Layout
+Affiliation
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Author
+Author name 3
+\begin_inset Argument post:1
+status open
+
+\begin_layout Plain Layout
+Affiliation
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Author
+Author name 4
+\begin_inset Argument post:1
+status open
+
+\begin_layout Plain Layout
+Affiliation
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Author
+Author name 5
+\begin_inset Argument post:1
+status open
+
+\begin_layout Plain Layout
+Affiliation
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Author
+Author name 6
+\begin_inset Argument post:1
+status open
+
+\begin_layout Plain Layout
+Affiliation
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout With
+Apart Research
+\end_layout
+
+\begin_layout Abstract
+\begin_inset Branch Guidance
+inverted 0
+status open
+
+\begin_layout Standard
+Summarize your project in 150–250 words.
+ A strong abstract lets a reviewer understand what you did and why it matters without reading anything else.
+ 
+\bar under
+Make sure to cover:
+ the problem,
+ your approach,
+ key results,
+ and the main takeaway
+\bar default
+.
+ Polish it last:
+ the abstract should reflect your final results,
+ not your initial plan.
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Branch Guidance
+inverted 0
+status open
+
+\begin_layout Standard
+\begin_inset Flex Info Box
+status open
+
+\begin_layout Plain Layout
+
+\series bold
+How to use this template
+\series default
+:
+ Replace the 
+\shape italic
+italicized guidance text
+\shape default
+ under each section with your content.
+ The section structure is strong guidance but not rigid.
+ If your project requires a different organization,
+ feel free to adapt.
+ 
+\bar under
+Delete all guidance text including this info box before submitting
+\bar default
+.
+ Make sure the project title and author information above are up to date.
+\end_layout
+
+\begin_layout Plain Layout
+
+\series bold
+How your submission will be evaluated
+\series default
+:
+ Your project will be judged on the quality of this written report.
+ To understand what we look for,
+ see our 
+\begin_inset CommandInset href
+LatexCommand href
+name "Evaluation Rubric"
+target "https://apartresearch.notion.site/sprint-evaluation-rubric"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Plain Layout
+
+\series bold
+Recommended length
+\series default
+:
+ 4 pages excluding references and appendix.
+\begin_inset Newline newline
+\end_inset
+
+Rough guide:
+ Intro & Related Work 1p,
+ Methods and Results:
+ 2.5p,
+ Discussion 0.5p.
+\end_layout
+
+\end_inset
+
+
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+\begin_inset Branch Guidance
+inverted 0
+status open
+
+\begin_layout Standard
+What problem are you addressing and why does it matter?
+\begin_inset Newline newline
+\end_inset
+
+Connect it to your work:
+ we want to know why your work is practically valuable.
+\end_layout
+
+\begin_layout Standard
+Provide enough background for readers to understand your work.
+\begin_inset Newline newline
+\end_inset
+
+If relevant,
+ briefly describe the threat model or failure mode you
+\begin_inset Quotes qrs
+\end_inset
+
+re addressing;
+ reference prior work that motivates why it is worth addressing,
+ or explain it yourself.
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Branch Guidance
+inverted 0
+status open
+
+\begin_layout Standard
+Aspire to clearly list your most important contributions that go beyond what exists today.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\series bold
+Our main contributions are:
+\end_layout
+
+\begin_layout Enumerate
+[First contribution —
+ what new thing did you create,
+ discover,
+ or demonstrate?]
+\end_layout
+
+\begin_layout Enumerate
+[Second contribution]
+\end_layout
+
+\begin_layout Enumerate
+[Third contribution,
+ if applicable]
+\end_layout
+
+\begin_layout Section
+Related Work
+\end_layout
+
+\begin_layout Standard
+\begin_inset Branch Guidance
+inverted 0
+status open
+
+\begin_layout Standard
+What prior work is most similar,
+ and how does your work differ?
+\begin_inset Newline newline
+\end_inset
+
+Cite the most relevant papers,
+ tools,
+ or projects.
+ Explain what gap your work addresses.
+\end_layout
+
+\begin_layout Standard
+Some questions which may help:
+\end_layout
+
+\begin_layout Lettered
+When and why would someone use your method over the existing state-of-the-art?
+\end_layout
+
+\begin_layout Lettered
+What information/insight does your method provide which we did not have before?
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Methods
+\end_layout
+
+\begin_layout Standard
+\begin_inset Branch Guidance
+inverted 0
+status open
+
+\begin_layout Standard
+Describe your approach clearly enough that someone could replicate it.
+ Include key design choices and justify them where relevant (hint:
+ the more you can back up your design choices by referencing prior work,
+ the better).
+\end_layout
+
+\begin_layout Standard
+What models/datasets/tools did you use and why?
+ What were key parameters or design decisions?
+ What did you try that didn
+\begin_inset Quotes qrs
+\end_inset
+
+t work?
+ Could someone reproduce your work from this description?
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Results
+\end_layout
+
+\begin_layout Standard
+\begin_inset Branch Guidance
+inverted 0
+status open
+
+\begin_layout Standard
+Present your main findings with appropriate evidence.
+ Use figures and tables where appropriate (we strongly encourage at least one figure,
+ see tips below).
+ Distinguish between observations and interpretations.
+\end_layout
+
+\begin_layout Standard
+Argue why your claims are robust.
+ E.g.,
+ if your approach “performs better” than alternatives:
+\end_layout
+
+\begin_layout Lettered
+Do you have enough data?
+ Is the difference statistically significant?
+\end_layout
+
+\begin_layout Lettered
+Is it robust?
+ Or do small changes to your setup cause substantial changes to your results?
+\end_layout
+
+\begin_layout Indented
+
+\series bold
+Tips for figures and tables:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Number all figures (Figure 1,
+ Figure 2...) and tables (Table 1,
+ Table 2...)
+\end_layout
+
+\begin_layout Itemize
+Include descriptive captions that can be understood without the main text
+\end_layout
+
+\begin_layout Itemize
+Place figures/tables near where they
+\begin_inset Quotes qrs
+\end_inset
+
+re first referenced
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Ensure text in figures is legible!
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\end_inset
+
+
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Discussion and Limitations
+\end_layout
+
+\begin_layout Standard
+\begin_inset Branch Guidance
+inverted 0
+status open
+
+\begin_layout Standard
+Discuss the broader implications for AI safety.
+\begin_inset Newline newline
+\end_inset
+
+What do your results mean?
+ What trends do you notice and what might they indicate?
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection*
+Limitations
+\end_layout
+
+\begin_layout Standard
+\begin_inset Branch Guidance
+inverted 0
+status open
+
+\begin_layout Standard
+What are the limitations of your work?
+ What threat models or failure modes did you not address?
+ Be honest about constraints —
+ methodological limitations,
+ scope limitations,
+ or aspects you couldn
+\begin_inset Quotes qrs
+\end_inset
+
+t fully address in the hackathon timeframe.
+ Explicitly note the assumptions you made,
+ whether implicitly or explicitly,
+ and how the interpretation of your results would change if a given assumption did not hold.
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection*
+Future Work
+\end_layout
+
+\begin_layout Standard
+\begin_inset Branch Guidance
+inverted 0
+status open
+
+\begin_layout Standard
+What are the natural next steps?
+ How could this work be extended?
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Conclusion
+\end_layout
+
+\begin_layout Standard
+\begin_inset Branch Guidance
+inverted 0
+status open
+
+\begin_layout Standard
+Briefly summarize your main findings and their implications (1–2 paragraphs).
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section*
+Code and Data
+\end_layout
+
+\begin_layout Standard
+\begin_inset Branch Guidance
+inverted 0
+status open
+
+\begin_layout Standard
+Include links if applicable.
+ If your project doesn
+\begin_inset Quotes qrs
+\end_inset
+
+t involve code (e.g.,
+ policy analysis) or if there are info-hazard considerations,
+ note that here.
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Code repository
+\series default
+:
+ [Link to GitHub/GitLab if applicable]
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Data/Datasets
+\series default
+:
+ [Link if applicable]
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Other artifacts
+\series default
+ (optional):
+ [Demo link,
+ video walkthrough,
+ Hugging Face Space,
+ etc.]
+\end_layout
+
+\begin_layout Section*
+Author Contributions (optional)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Branch Guidance
+inverted 0
+status open
+
+\begin_layout Standard
+[e.g.,
+ "A.B.
+ led the project and designed experiments.
+ C.D.
+ implemented the code.
+ All authors contributed to writing and reviewed the final manuscript."]
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section*
+References
+\end_layout
+
+\begin_layout Standard
+\begin_inset Branch Guidance
+inverted 0
+status open
+
+\begin_layout Standard
+Use a consistent citation format.
+ Include:
+ Author(s),
+ Year,
+ Title,
+ Venue/Publisher,
+ and URL or DOI where available.
+\end_layout
+
+\begin_layout Enumerate
+[Reference 1]
+\end_layout
+
+\begin_layout Enumerate
+[Reference 2]
+\end_layout
+
+\begin_layout Enumerate
+...
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+btprint "btPrintCited"
+bibfiles "library"
+encoding "default"
+biblatexopts "heading=none"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section*
+Appendix (optional)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Branch Guidance
+inverted 0
+status open
+
+\begin_layout Standard
+Supplementary material such as additional figures,
+ detailed methodology,
+ prompts used,
+ extended results,
+ etc.
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section*
+LLM Usage Statement
+\end_layout
+
+\begin_layout Standard
+\begin_inset Branch Guidance
+inverted 0
+status open
+
+\begin_layout Standard
+If you used LLM assistance in developing your project or writing this report,
+ briefly note how.
+ Ensure all claims and results have been verified.
+\end_layout
+
+\begin_layout Standard
+NOTE:
+ We strongly encourage that the final version of the submission is primarily written by your team.
+\end_layout
+
+\begin_layout Standard
+[e.g.,
+ "We used Claude to brainstorm approaches and help draft sections.
+ All results and claims were independently verified."]
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
