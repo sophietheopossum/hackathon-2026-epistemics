@@ -841,7 +841,17 @@ t involve code (e.g.,
 Code repository
 \series default
 :
- [Link to GitHub/GitLab if applicable]
+ 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+https://github.com/sophietheopossum/hackathon-2026-epistemics/
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Itemize
