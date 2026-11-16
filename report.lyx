@@ -553,6 +553,52 @@ An evaluation with Claude Opus 5.5 and an error-injection test showing that prov
 \end_layout
 
 \begin_layout Section
+Related Work
+\end_layout
+
+\begin_layout Standard
+\begin_inset Branch Guidance
+inverted 0
+status open
+
+\begin_layout Standard
+What prior work is most similar,
+ and how does your work differ?
+\begin_inset Newline newline
+\end_inset
+
+Cite the most relevant papers,
+ tools,
+ or projects.
+ Explain what gap your work addresses.
+\end_layout
+
+\begin_layout Standard
+Some questions which may help:
+\end_layout
+
+\begin_layout Lettered
+When and why would someone use your method over the existing state-of-the-art?
+\end_layout
+
+\begin_layout Lettered
+What information/insight does your method provide which we did not have before?
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
 Methods
 \end_layout
 
@@ -1578,6 +1624,44 @@ The main limitations of this work,
 \end_layout
 
 \begin_layout Subsection*
+Limitations
+\end_layout
+
+\begin_layout Standard
+\begin_inset Branch Guidance
+inverted 0
+status open
+
+\begin_layout Standard
+What are the limitations of your work?
+ What threat models or failure modes did you not address?
+ Be honest about constraints —
+ methodological limitations,
+ scope limitations,
+ or aspects you couldn
+\begin_inset Quotes qrs
+\end_inset
+
+t fully address in the hackathon timeframe.
+ Explicitly note the assumptions you made,
+ whether implicitly or explicitly,
+ and how the interpretation of your results would change if a given assumption did not hold.
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection*
 Future Work
 \end_layout
 
@@ -1685,6 +1769,70 @@ status open
 \begin_layout Plain Layout
 https://github.com/sophietheopossum/hackathon-2026-epistemics/
 \end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section*
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section*
+References
+\end_layout
+
+\begin_layout Standard
+\begin_inset Branch Guidance
+inverted 0
+status open
+
+\begin_layout Standard
+Use a consistent citation format.
+ Include:
+ Author(s),
+ Year,
+ Title,
+ Venue/Publisher,
+ and URL or DOI where available.
+\end_layout
+
+\begin_layout Enumerate
+[Reference 1]
+\end_layout
+
+\begin_layout Enumerate
+[Reference 2]
+\end_layout
+
+\begin_layout Enumerate
+...
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Separator parbreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+btprint "btPrintCited"
+bibfiles "library"
+encoding "default"
+biblatexopts "heading=none"
 
 \end_inset
 
