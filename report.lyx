@@ -636,7 +636,7 @@ literal "false"
  epistaint instead records the evidence at the moment a tool is called,
  outside the model's control,
  so that citations can be checked deterministically.
- Tracking where data came from is the idea behind information-flow control(
+ Tracking how information flows between sources of different trust is the idea behind information-flow control(
 \begin_inset CommandInset citation
 LatexCommand cite
 key "denning1976lattice"
@@ -668,7 +668,8 @@ literal "false"
  I apply the same idea to epistemics rather than security:
  the labels describe how trustworthy a claim's evidence is.
  The log is hash-chained,
- a standard technique for tamper-evident logging(
+ the classic construction for tamper-evident logs;
+ Crosby and Wallach describe a more efficient tree-based alternative(
 \begin_inset CommandInset citation
 LatexCommand cite
 key "crosby2009tamper"
