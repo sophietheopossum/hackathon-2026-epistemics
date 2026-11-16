@@ -618,7 +618,9 @@ In order to track the claims made by LLMs,
 \begin_inset Newline newline
 \end_inset
 
-The produced harness allows you to 
+The produced harness allows you to trace any claim an LLM makes via trace IDs.
+ Whilst for this experiment we use ready made test data that already has trace IDs for every relevant result,
+ it wouldn't be impossible to create a companion tool that applies this metadata for you.
 \begin_inset Newline newline
 \end_inset
 
