@@ -27,16 +27,24 @@ import json
 import re
 import sys
 from dataclasses import dataclass, field
-from decimal import Decimal, InvalidOperation
+from decimal import ROUND_HALF_EVEN, ROUND_HALF_UP, Decimal, InvalidOperation
 from pathlib import Path
 
 from .core import Store, Tier, Trace, tier_label, verify_chain
 
 CITE_RE = re.compile(r"\[\[\s*(t-[0-9a-fA-F]{4,16})\s*\]\]|\[(?:trace|t)\s*[:=]\s*(t-[0-9a-fA-F]{4,16})\]")
 CITE_ONLY_RE = re.compile(r"(?:\s*(?:\[\[\s*t-[0-9a-fA-F]{4,16}\s*\]\]|\[(?:trace|t)\s*[:=]\s*t-[0-9a-fA-F]{4,16}\])[\s.,;]*)+")
-QUOTE_RE = re.compile(r'"([^"\n]{3,}?)"|“([^”\n]{3,}?)”|`([^`\n]{3,}?)`')
-NUM_RE = re.compile(r"(?<![\w.])[-−]?\d[\d,]*(?:\.\d+)?(?![\w])")
-SENT_SPLIT = re.compile(r"(?<=[.!?])\s+(?=[A-Z0-9\"“(\[*_`])")
+# Quotations to verify (backticks mark code and paths, not quotations).
+QUOTE_RE = re.compile(r'"([^"\n]{3,}?)"|“([^”\n]{3,}?)”')
+# Numbers; a comma only counts as a thousands separator before exactly three digits, so CSV
+# text such as "1022,0.852" is read as two numbers.
+NUM_RE = re.compile(r"(?<![\w.])[-−]?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?(?![\w])")
+PLAIN_NUM_RE = re.compile(r"(?<![\w.])[-−]?\d+(?:\.\d+)?(?![\w])")
+SENT_SPLIT = re.compile(
+    r"(?<=[.!?])\s+(?=[A-Z0-9\"“(\[*_`])"  # full stop, next sentence starts with a capital etc.
+    r"|(?<=[.!?][\"”’)])\s+"               # full stop inside a closing quote or bracket
+    r"|(?<=\]\])[.,;]?\s+(?=[^\s\[])"      # a citation ends the sentence it supports
+)
 LIST_MARK = re.compile(r"^(?:[-*+•]|\d+[.)])\s+")
 
 # Statuses, worst first.
@@ -162,12 +170,25 @@ def citations_in(text: str) -> list[str]:
 
 
 def quotes_in(text: str) -> list[str]:
+    """Quotations of two or more words (a single quoted word is a term, not a quotation)."""
     out = []
     for groups in QUOTE_RE.findall(strip_citations(text)):
         q = next(g for g in groups if g).strip(" .,;:")
-        if q:
+        if len(q.split()) >= 2:
             out.append(q)
     return out
+
+
+def quote_found(quote: str, evidence_norm: str) -> bool:
+    """Verbatim match, allowing editorial insertions ("[is]") and ellipses between fragments."""
+    frags = [normalise(f).strip(" .,;:") for f in re.split(r"\[[^\]]*\]|\.\.\.|…", quote)]
+    pos = 0
+    for frag in (f for f in frags if f):
+        i = evidence_norm.find(frag, pos)
+        if i < 0:
+            return False
+        pos = i + len(frag)
+    return True
 
 
 def _dec(token: str) -> Decimal | None:
@@ -178,32 +199,37 @@ def _dec(token: str) -> Decimal | None:
         return None
 
 
-def numbers_in(text: str) -> list[str]:
-    body = QUOTE_RE.sub(" ", strip_citations(text))  # quotes are checked verbatim instead
-    return [m.group(0) for m in NUM_RE.finditer(body)]
+def numbers_in(text: str) -> list[tuple[str, bool]]:
+    """(number, is_percentage) pairs; numbers inside quotations are checked as quotes instead."""
+    body = QUOTE_RE.sub(" ", strip_citations(text))
+    return [(m.group(0), bool(re.match(r"\s*(%|per ?cent)", body[m.end():]))) for m in NUM_RE.finditer(body)]
 
 
-def number_supported(claimed: str, evidence_numbers: list[Decimal]) -> bool:
-    """True if some evidence number equals the claimed one at the claim's stated precision."""
+def number_supported(claimed: str, evidence_numbers: list[Decimal], percent: bool = False) -> bool:
+    """True if some evidence number equals the claimed one at the claim's stated precision
+    (rounding half-up or half-even); a percentage may also match a fraction (40% ~ 0.4043)."""
     c = _dec(claimed)
     if c is None or not c.is_finite():
         return True
     exponent = c.as_tuple().exponent
     places = -exponent if isinstance(exponent, int) and exponent < 0 else 0
     quantum = Decimal(1).scaleb(-places)
-    for e in evidence_numbers:
-        if e == c or abs(e) == abs(c):
+    candidates = list(evidence_numbers) + ([e * 100 for e in evidence_numbers] if percent else [])
+    for e in candidates:
+        if abs(e) == abs(c):
             return True
-        try:
-            if e.quantize(quantum) == c or abs(e).quantize(quantum) == abs(c):
-                return True
-        except InvalidOperation:
-            continue
+        for mode in (ROUND_HALF_EVEN, ROUND_HALF_UP):
+            try:
+                if abs(e).quantize(quantum, rounding=mode) == abs(c):
+                    return True
+            except InvalidOperation:
+                break
     return False
 
 
 def evidence_numbers(text: str) -> list[Decimal]:
-    return [d for d in (_dec(m.group(0)) for m in NUM_RE.finditer(text)) if d is not None]
+    tokens = {m.group(0) for rx in (NUM_RE, PLAIN_NUM_RE) for m in rx.finditer(text)}
+    return [d for d in (_dec(t) for t in tokens) if d is not None]
 
 
 # ------------------------------------------------------------------- audit
@@ -267,8 +293,8 @@ def audit(answer: str, traces: list[Trace], session: str = "") -> Report:
         statuses: set[str] = set()
         if not c.citations:
             statuses.add(UNCITED)
-            missing_q = [q for q in quotes if normalise(q) not in all_text]
-            missing_n = [n for n in numbers if not number_supported(n, all_numbers)]
+            missing_q = [q for q in quotes if not quote_found(q, all_text)]
+            missing_n = [n for n, pct in numbers if not number_supported(n, all_numbers, pct)]
             c.flags += [f"unanchored-quote: {q!r}" for q in missing_q]
             c.flags += [f"unanchored-number: {n}" for n in missing_n]
             if quotes or numbers:
@@ -284,18 +310,18 @@ def audit(answer: str, traces: list[Trace], session: str = "") -> Report:
                 cited_text = normalise("\n".join(t.output for t in known))
                 cited_numbers = evidence_numbers("\n".join(t.output for t in known))
                 for q in quotes:
-                    if normalise(q) in cited_text:
+                    if quote_found(q, cited_text):
                         c.checked += 1
                     else:
                         statuses.add(MISQUOTE)
-                        where = "in another trace" if normalise(q) in all_text else "in no trace"
+                        where = "in another trace" if quote_found(q, all_text) else "in no trace"
                         c.flags.append(f"quote not in cited output ({where}): {q!r}")
-                for n in numbers:
-                    if number_supported(n, cited_numbers):
+                for n, pct in numbers:
+                    if number_supported(n, cited_numbers, pct):
                         c.checked += 1
                     else:
                         statuses.add(UNSUPPORTED)
-                        where = "in another trace" if number_supported(n, all_numbers) else "in no trace"
+                        where = "in another trace" if number_supported(n, all_numbers, pct) else "in no trace"
                         c.flags.append(f"number not in cited output ({where}): {n}")
                 if any(t.is_error for t in known):
                     c.flags.append("cites a tool call that returned an error")
@@ -355,7 +381,8 @@ def feedback(report: Report) -> str:
         return ""
     out = ["Your answer failed the provenance audit. Fix these claims: re-run a tool if needed, "
            "cite the trace id printed with its output as [[t-xxxxxxxx]], quote and copy numbers "
-           "exactly, or remove the claim."]
+           "exactly, or remove the claim. Reply with the complete corrected answer only, without "
+           "commentary on what you changed."]
     for c in bad:
         out.append(f"- Claim {c.index} ({c.status}): {c.text}" + "".join(f"\n    {f}" for f in c.flags))
     return "\n".join(out)

@@ -71,10 +71,10 @@ def mutate(claim: str, kind: str, traces: list[Trace]) -> str | None:
         new = num[:idx] + str((int(num[idx]) + 3) % 10) + num[idx + 1:]
         return claim[:m.start()] + new + claim[m.end():]
     if kind == "quote":
-        m = next((m for m in QUOTE_RE.finditer(body)), None)
+        m = next((m for m in QUOTE_RE.finditer(body) if len(next(g for g in m.groups() if g).split()) >= 2), None)
         if not m:
             return None
-        start = next(m.start(g) for g in (1, 2, 3) if m.group(g))
+        start = next(m.start(g) for g in (1, 2) if m.group(g))
         q = claim[start:start + len(next(g for g in m.groups() if g))]
         words = list(re.finditer(r"[A-Za-z]{3,}", q))
         if not words:
@@ -124,6 +124,32 @@ def inject(runs_dir: Path, db: Path) -> dict:
     return {"summary": summary, "rows": rows}
 
 
+def summary_row(meta: dict, s: dict) -> dict:
+    return {**meta, "claims": s["claims"], "grounded": s["status"][GROUNDED], "uncited": s["status"][UNCITED],
+            "fabricated": s["status"][FABRICATED], "misquote": s["status"][MISQUOTE],
+            "unsupported": s["status"][UNSUPPORTED], "unanchored_claims": s["unanchored_claims"],
+            "checkable_claims": s["checkable_claims"], "grounded_rate": s["grounded_rate"],
+            "t0": s["taint"]["T0_DETERMINISTIC"], "t1": s["taint"]["T1_ATTESTED"],
+            "t2": s["taint"]["T2_UNTRUSTED"], "t3": s["taint"]["T3_SYNTHETIC"]}
+
+
+def reaudit(csv_path: Path, runs_dir: Path, db: Path) -> list[dict]:
+    """Re-score the final answers of an earlier `agents` sweep with the current auditor."""
+    store = Store(db)
+    rows = []
+    for r in csv.DictReader(csv_path.open()):
+        if r.get("error"):
+            rows.append(r)
+            continue
+        d = runs_dir / r["session"]
+        answer = d / "answer.revised.md" if (d / "answer.revised.md").exists() else d / "answer.md"
+        report = audit(answer.read_text(), store.session_traces(r["session"]), r["session"])
+        (d / "audit.json").write_text(json.dumps(report.to_json(), indent=2, ensure_ascii=False))
+        meta = {k: r[k] for k in ("question", "q", "arm", "session", "seconds", "cost_usd", "revised")}
+        rows.append(summary_row(meta, report.summary))
+    return rows
+
+
 def agents(questions: list[str], arms: list[str], reps: int, jobs: int, runs_dir: Path, db: Path,
            model: str | None) -> list[dict]:
     from .run import run  # imported lazily: only this part needs Claude Code
@@ -138,14 +164,9 @@ def agents(questions: list[str], arms: list[str], reps: int, jobs: int, runs_dir
             s = res["report"]["summary"]
             print(f"[done] {arm:10s} {tag}: {s['claims']} claims, grounded {s['grounded_rate']:.0%}, "
                   f"violations {s['violations']}, unanchored {s['unanchored_claims']}", file=sys.stderr)
-            return {"question": q, "q": tag, "arm": arm, "session": res["session"], "seconds": res["seconds"],
-                    "cost_usd": res["cost_usd"], "revised": res["revised"], **{
-                        "claims": s["claims"], "grounded": s["status"][GROUNDED], "uncited": s["status"][UNCITED],
-                        "fabricated": s["status"][FABRICATED], "misquote": s["status"][MISQUOTE],
-                        "unsupported": s["status"][UNSUPPORTED], "unanchored_claims": s["unanchored_claims"],
-                        "checkable_claims": s["checkable_claims"], "grounded_rate": s["grounded_rate"],
-                        "t0": s["taint"]["T0_DETERMINISTIC"], "t1": s["taint"]["T1_ATTESTED"],
-                        "t2": s["taint"]["T2_UNTRUSTED"], "t3": s["taint"]["T3_SYNTHETIC"]}}
+            return summary_row({"question": q, "q": tag, "arm": arm, "session": res["session"],
+                                "seconds": res["seconds"], "cost_usd": res["cost_usd"],
+                                "revised": res["revised"]}, s)
         except Exception as e:  # keep the sweep going; record the failure
             print(f"[fail] {arm} {tag}: {e}", file=sys.stderr)
             return {"question": q, "q": tag, "arm": arm, "error": str(e)}
@@ -161,7 +182,7 @@ def table(rows: list[dict]) -> str:
              "|---|---|---|---|---|---|---|---|---|---|"]
     for arm in arms:
         sel = [r for r in ok if r["arm"] == arm]
-        tot = {k: sum(r[k] for r in sel) for k in ["claims", "grounded", "uncited", "fabricated", "misquote",
+        tot = {k: sum(int(r[k]) for r in sel) for k in ["claims", "grounded", "uncited", "fabricated", "misquote",
                                                    "unsupported", "unanchored_claims", "t2"]}
         pct = lambda k: f"{tot[k]} ({tot[k] / tot['claims']:.0%})" if tot["claims"] else "0"  # noqa: E731
         lines.append(f"| {arm} | {len(sel)} | {tot['claims']} | {pct('grounded')} | {pct('uncited')} | "
@@ -174,7 +195,9 @@ def main(argv: list[str] | None = None) -> int:
     sub = ap.add_subparsers(dest="cmd", required=True)
     pi = sub.add_parser("inject")
     pa = sub.add_parser("agents")
-    for p in (pi, pa):
+    pr = sub.add_parser("reaudit")
+    pr.add_argument("csv", type=Path, help="per-run CSV written by an earlier `agents` sweep")
+    for p in (pi, pa, pr):
         p.add_argument("--runs-dir", type=Path, default=ROOT / "runs")
         p.add_argument("--db", type=Path, default=ROOT / "runs" / "traces.db")
     pa.add_argument("--questions", type=Path, default=ROOT / "demo" / "questions.txt")
@@ -196,6 +219,17 @@ def main(argv: list[str] | None = None) -> int:
             cat = "-" if s.get("right_category") is None else str(s["right_category"])
             print(f"| {label} | {s['n']} | {s['flagged']} | {rate} | {cat} |")
         print(f"\n(details: {out})")
+        return 0
+
+    if args.cmd == "reaudit":
+        rows = reaudit(args.csv, args.runs_dir, args.db)
+        out = args.runs_dir / f"reaudit-{stamp}.csv"
+        with out.open("w", newline="") as f:
+            w = csv.DictWriter(f, fieldnames=sorted({k for r in rows for k in r}))
+            w.writeheader()
+            w.writerows(rows)
+        print(table(rows))
+        print(f"\n(per-run rows: {out})")
         return 0
 
     questions = [q.strip() for q in args.questions.read_text().splitlines() if q.strip() and not q.startswith("#")]

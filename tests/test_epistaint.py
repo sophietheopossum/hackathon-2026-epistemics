@@ -153,6 +153,25 @@ class Audit(unittest.TestCase):
         report = self.run_audit(f"Rain hit Ashby Fen and 999 files were lost. It was 14 Sep. [[{l}]]")
         self.assertEqual(report.claims[0].status, UNSUPPORTED)  # inherited citation does not excuse 999
 
+    def test_artifacts_seen_in_real_runs(self):
+        now = time.time()
+        csv = self.store.append("s", now, "grep", {"pattern": "v3"}, Tier.T0, "r", False,
+                                "runs.csv:21: R020,Ashby Moor,v3,test,1022,0.852,0.066,2026-09-12")
+        rel = self.store.append("s", now, "sql_query", {"sql": "..."}, Tier.T0, "r", False,
+                                "rel_increase\n0.4043\nmean\n0.8465")
+        rev = self.store.append("s", now, "read_file", {"path": "x"}, Tier.T0, "r", False,
+                                "- Is the v3 head worth its 2.4x inference cost on the field hardware?")
+        c, r, v = csv.trace_id, rel.trace_id, rev.trace_id
+        answer = "\n".join([
+            f"v3 scored 0.852 at Ashby Moor, from 1022 recordings [[{c}]].",       # CSV text: two numbers
+            f"That is about 40% higher, and v2 averaged 0.847 [[{r}]].",            # percent; half-up rounding
+            f"The source is `runs.csv` and the search for \"Ashby\" matched [[{c}]].",  # path and term, no quotes
+            f"They asked whether \"the v3 head [is] worth its 2.4x inference cost\" [[{v}]].",  # editorial insertion
+            f'Dr Hale said "the field hardware" mattered. [[{v}]] v3 needs 2.4x the cost [[{v}]].',
+        ])
+        report = self.run_audit(answer)
+        self.assertEqual([cl.status for cl in report.claims], [GROUNDED] * 6, [cl.flags for cl in report.claims])
+
     def test_tampered_log_is_detected(self):
         self.store.db.execute("UPDATE traces SET output = REPLACE(output, '212', '312')")
         self.store.db.commit()
