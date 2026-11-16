@@ -591,7 +591,30 @@ What information/insight does your method provide which we did not have before?
 
 \end_inset
 
-
+Hallucination in large language models is well documented [huang2024hallucination].
+ One response is to make models cite their sources:
+ Rashkin et al.
+ define when generated text is attributable to a source [rashkin2023ais],
+ Gao et al.
+ benchmark the citation quality of LLM answers [gao2023alce],
+ and Liu et al.
+ found that only about half of the sentences produced by generative search engines were fully supported by their citations [liu2023verifiability].
+ These approaches evaluate citations after the fact,
+ usually with human or model judges.
+ epistaint instead records the evidence at the moment a tool is called,
+ outside the model's control,
+ so that citations can be checked deterministically.
+ Tracking where data came from is the idea behind information-flow control [denning1976lattice],
+ which has recently been applied to LLM agents for security,
+ to stop untrusted tool outputs,
+ such as indirect prompt injections [greshake2023indirect],
+ from steering an agent's actions [debenedetti2025camel;
+ costa2025fides].
+ I apply the same idea to epistemics rather than security:
+ the labels describe how trustworthy a claim's evidence is.
+ The log is hash-chained,
+ a standard technique for tamper-evident logging [crosby2009tamper],
+ and the proxy wraps the Model Context Protocol [anthropic2024mcp].
 \begin_inset Separator parbreak
 \end_inset
 
