@@ -86,7 +86,7 @@
 \table_even_row_color default
 \table_alt_row_colors_start 1
 \branch Guidance
-\selected 1
+\selected 0
 \filename_suffix 0
 \color #fff2cc #4a3f1d
 \end_branch
@@ -331,7 +331,30 @@ Make sure to cover:
 
 \end_inset
 
-
+Large language model (LLM) agents increasingly answer research questions by calling tools,
+ yet their answers can still contain claims that no tool output supports,
+ and a reader cannot easily tell which claims are grounded.
+ I present epistaint,
+ an epistemic taint-tracking harness that records every tool call an agent makes outside the model's control and audits its final answer claim by claim.
+ A transparent Model Context Protocol (MCP) proxy logs each tool result with a trace id,
+ a trust tier set by a policy file and a hash-chained digest,
+ and tags the result so that the agent can cite it.
+ An auditor then checks every claim:
+ cited trace ids must exist,
+ quotations and numbers must appear in the cited output,
+ uncited claims are labelled synthetic,
+ and each claim inherits the least trustworthy tier among its sources.
+ On six questions about a fictional research corpus answered by Claude Opus 5.5,
+ the agent's claims were well supported in every condition,
+ but provenance linked 74% of its claims to specific evidence,
+ and 92% after one round of audit feedback,
+ whereas without provenance only about two-thirds of claims could be checked at all.
+ In an error-injection test on 229 real claims,
+ the audit caught every fabricated citation,
+ 94% of changed numbers and 90% of misattributed citations with checkable content,
+ with no false positives.
+ The harness does not prevent hallucinations;
+ it makes them visible.
 \begin_inset Separator parbreak
 \end_inset
 
@@ -512,65 +535,21 @@ Our main contributions are:
 \end_layout
 
 \begin_layout Enumerate
-[First contribution —
- what new thing did you create,
- discover,
- or demonstrate?]
+A transparent MCP proxy that records every tool call an agent makes outside the model's control,
+ with a policy-assigned trust tier and a tamper-evident hash chain,
+ and tags each result so that claims can cite it.
 \end_layout
 
 \begin_layout Enumerate
-[Second contribution]
+A deterministic,
+ claim-level auditor that flags fabricated citations,
+ misquotations,
+ numbers missing from the cited evidence and uncited (synthetic) claims,
+ and gives each claim the least trustworthy tier among its sources.
 \end_layout
 
 \begin_layout Enumerate
-[Third contribution,
- if applicable]
-\end_layout
-
-\begin_layout Section
-Related Work
-\end_layout
-
-\begin_layout Standard
-\begin_inset Branch Guidance
-inverted 0
-status open
-
-\begin_layout Standard
-What prior work is most similar,
- and how does your work differ?
-\begin_inset Newline newline
-\end_inset
-
-Cite the most relevant papers,
- tools,
- or projects.
- Explain what gap your work addresses.
-\end_layout
-
-\begin_layout Standard
-Some questions which may help:
-\end_layout
-
-\begin_layout Lettered
-When and why would someone use your method over the existing state-of-the-art?
-\end_layout
-
-\begin_layout Lettered
-What information/insight does your method provide which we did not have before?
-\begin_inset Separator parbreak
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\begin_inset Separator parbreak
-\end_inset
-
-
+An evaluation with Claude Opus 5.5 and an error-injection test showing that provenance makes most claims checkable against specific evidence and catches citation errors that a plain tool log cannot.
 \end_layout
 
 \begin_layout Section
@@ -1589,45 +1568,9 @@ What do your results mean?
 
 \end_inset
 
-
-\begin_inset Separator parbreak
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsection*
-Limitations
-\end_layout
-
-\begin_layout Standard
-\begin_inset Branch Guidance
-inverted 0
-status open
-
-\begin_layout Standard
-What are the limitations of your work?
- What threat models or failure modes did you not address?
- Be honest about constraints —
- methodological limitations,
- scope limitations,
- or aspects you couldn
-\begin_inset Quotes qrs
-\end_inset
-
-t fully address in the hackathon timeframe.
- Explicitly note the assumptions you made,
- whether implicitly or explicitly,
- and how the interpretation of your results would change if a given assumption did not hold.
-\begin_inset Separator parbreak
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
+The main limitations of this work,
+ and the ways the tool could be misused,
+ are set out in the Limitations and Dual-Use / Ethical Considerations appendix.
 \begin_inset Separator parbreak
 \end_inset
 
@@ -1681,7 +1624,15 @@ Briefly summarize your main findings and their implications (1–2 paragraphs).
 
 \end_inset
 
-
+Epistemic taint tracking does not stop an LLM agent from making unsupported claims,
+ but it makes them visible:
+ each claim is either tied to the tool output it relies on,
+ with a trust tier,
+ or flagged.
+ In a small evaluation,
+ provenance linked up to 92% of an agent's claims to specific evidence and caught every fabricated citation planted in real answers,
+ with no false positives.
+ Checking whether a cited claim interprets its evidence correctly remains the main open problem.
 \begin_inset Separator parbreak
 \end_inset
 
@@ -1740,143 +1691,53 @@ https://github.com/sophietheopossum/hackathon-2026-epistemics/
 
 \end_layout
 
-\begin_layout Itemize
-
-\series bold
-Data/Datasets
-\series default
-:
- [Link if applicable]
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-Other artifacts
-\series default
- (optional):
- [Demo link,
- video walkthrough,
- Hugging Face Space,
- etc.]
-\end_layout
-
 \begin_layout Section*
-Author Contributions (optional)
+Limitations and Dual-Use / Ethical Considerations
 \end_layout
 
 \begin_layout Standard
-\begin_inset Branch Guidance
-inverted 0
-status open
-
-\begin_layout Standard
-[e.g.,
- "A.B.
- led the project and designed experiments.
- C.D.
- implemented the code.
- All authors contributed to writing and reviewed the final manuscript."]
-\begin_inset Separator parbreak
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\begin_inset Separator parbreak
-\end_inset
-
-
-\end_layout
-
-\begin_layout Section*
-References
+What this work does and does not establish.
+ The harness records an agent's tool calls in a tamper-evident log and flags claims that are uncited,
+ cite traces that do not exist,
+ or contain numbers or quotations missing from the evidence they cite;
+ on a small fictional corpus it detected planted errors of these kinds reliably,
+ with no false positives.
+ It does not check whether a claim interprets its evidence correctly:
+ a number taken from the right source but used in the wrong context (for example,
+ validation rather than test accuracy) passes.
+ Claims without numbers or quotations can only be checked for whether their citation exists,
+ and numbers are matched as a set of values,
+ so a changed number that appears elsewhere in the cited output passes.
+ A trust tier describes how evidence was obtained,
+ not whether the source is right.
+ The results come from one model,
+ six questions,
+ one run per condition and a fictional corpus,
+ so they show that the approach works rather than how often it is needed,
+ and no statistical significance is claimed.
 \end_layout
 
 \begin_layout Standard
-\begin_inset Branch Guidance
-inverted 0
-status open
-
-\begin_layout Standard
-Use a consistent citation format.
- Include:
- Author(s),
- Year,
- Title,
- Venue/Publisher,
- and URL or DOI where available.
-\end_layout
-
-\begin_layout Enumerate
-[Reference 1]
-\end_layout
-
-\begin_layout Enumerate
-[Reference 2]
-\end_layout
-
-\begin_layout Enumerate
-...
-\begin_inset Separator parbreak
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\begin_inset Separator parbreak
-\end_inset
-
-
+Dual use.
+ A “grounded” label could lend unwarranted authority to a claim:
+ an agent can cite a real trace that does not support what it says,
+ and a reader might treat the label as proof.
+ Tiers come from a policy file,
+ so whoever writes the policy decides what counts as trustworthy,
+ and a misleading policy could make untrusted sources look deterministic.
+ The log of tool calls could also be used to monitor what users and agents read.
+ To limit this,
+ the audit reports what was and was not checked for each claim rather than a single verdict,
+ and the policy is a plain,
+ inspectable file.
 \end_layout
 
 \begin_layout Standard
-\begin_inset CommandInset bibtex
-LatexCommand bibtex
-btprint "btPrintCited"
-bibfiles "library"
-encoding "default"
-biblatexopts "heading=none"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Section*
-Appendix (optional)
-\end_layout
-
-\begin_layout Standard
-\begin_inset Branch Guidance
-inverted 0
-status open
-
-\begin_layout Standard
-Supplementary material such as additional figures,
- detailed methodology,
- prompts used,
- extended results,
- etc.
-\begin_inset Separator parbreak
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\begin_inset Separator parbreak
-\end_inset
-
-
+Personal data.
+ No personal data was used.
+ The corpus is fictional,
+ and the only external service involved was the Claude model,
+ accessed through Claude Code.
 \end_layout
 
 \begin_layout Section*
