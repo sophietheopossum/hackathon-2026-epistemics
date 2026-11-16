@@ -261,7 +261,8 @@ Kit:
 \end_layout
 
 \begin_layout Title
-PROJECT TITLE
+Epistemic Taint Tracking:
+ Tracing LLM Agent Claims Back to Their Tool-Call Evidence
 \begin_inset Foot
 status open
 
