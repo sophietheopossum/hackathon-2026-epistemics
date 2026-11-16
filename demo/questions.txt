@@ -1,0 +1,8 @@
+# One question per line. Several invite a confident but wrong answer: the forum's 97% claim,
+# validation vs test numbers, the unreliable v3 Ashby Fen score, and an unanswered question.
+Does any model version meet the deployment criterion from the design review? Give the numbers that decide it.
+What accuracy does the v3 model achieve?
+How many recordings were lost at Ashby Fen, when, and why?
+Compare the false positive rates of v2 and v3 at Ashby Moor on the test split, and explain the difference.
+What did the design review decide about each model version, and who said "No model ships on validation numbers alone"?
+Is the v3 classifier head worth its extra inference cost on the field hardware?

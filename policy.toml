@@ -1,0 +1,45 @@
+# epistaint tier policy: decided at the execution boundary, never by the model.
+# First matching rule wins. Tiers: T0 deterministic, T1 attested, T2 untrusted (T3 = no evidence).
+
+default_tier = "T2"
+
+# Local pages saved from the web are only as good as the web: the read is deterministic,
+# but the content is untrusted, so this rule comes before the generic file rules.
+[[rule]]
+tool = "read_file"
+arg = "path"
+match = "^(\\./)?web-cache/"
+tier = "T2"
+reason = "local copy of unverified web content"
+
+[[rule]]
+tool = "sql_query"
+tier = "T0"
+reason = "deterministic read-only query over local data"
+
+[[rule]]
+tool = "read_file"
+tier = "T0"
+reason = "local file read"
+
+[[rule]]
+tool = "grep"
+tier = "T0"
+reason = "local deterministic search"
+
+[[rule]]
+tool = "list_files"
+tier = "T0"
+reason = "local directory listing"
+
+[[rule]]
+tool = "fetch_url"
+arg = "url"
+domains = ["arxiv.org", "docs.python.org", "modelcontextprotocol.io", "apartresearch.com", "wikipedia.org"]
+tier = "T1"
+reason = "primary source on an allowlisted domain"
+
+[[rule]]
+tool = "fetch_url"
+tier = "T2"
+reason = "arbitrary web content"

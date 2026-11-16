@@ -4,3 +4,8 @@
 report.lyx~
 
 report.pdf
+__pycache__/
+*.pyc
+.venv/
+runs/
+*.db

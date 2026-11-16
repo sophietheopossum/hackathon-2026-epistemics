@@ -1,0 +1,25 @@
+run_id,site,model,split,recordings,accuracy,false_positive_rate,date
+R001,Ashby Fen,v1,validation,1208,0.782,0.064,2026-09-12
+R002,Ashby Fen,v1,test,194,0.780,0.069,2026-09-18
+R003,Ashby Moor,v1,validation,1447,0.780,0.055,2026-09-18
+R004,Ashby Moor,v1,test,1408,0.790,0.094,2026-09-09
+R005,Carrow Wood,v1,validation,1110,0.810,0.064,2026-09-19
+R006,Carrow Wood,v1,test,454,0.761,0.102,2026-09-09
+R007,Dunmere Point,v1,validation,631,0.811,0.063,2026-09-27
+R008,Dunmere Point,v1,test,846,0.777,0.065,2026-09-28
+R009,Ashby Fen,v2,validation,816,0.881,0.030,2026-09-14
+R010,Ashby Fen,v2,test,451,0.849,0.043,2026-09-09
+R011,Ashby Moor,v2,validation,1184,0.893,0.038,2026-09-05
+R012,Ashby Moor,v2,test,1302,0.823,0.047,2026-09-08
+R013,Carrow Wood,v2,validation,625,0.875,0.031,2026-09-07
+R014,Carrow Wood,v2,test,1246,0.860,0.044,2026-09-28
+R015,Dunmere Point,v2,validation,628,0.855,0.048,2026-09-16
+R016,Dunmere Point,v2,test,1000,0.854,0.055,2026-09-14
+R017,Ashby Fen,v3,validation,853,0.907,0.041,2026-09-17
+R018,Ashby Fen,v3,test,290,0.812,0.084,2026-09-02
+R019,Ashby Moor,v3,validation,443,0.881,0.048,2026-09-07
+R020,Ashby Moor,v3,test,1022,0.852,0.066,2026-09-12
+R021,Carrow Wood,v3,validation,1125,0.931,0.027,2026-09-22
+R022,Carrow Wood,v3,test,1192,0.906,0.025,2026-09-20
+R023,Dunmere Point,v3,validation,634,0.899,0.034,2026-09-02
+R024,Dunmere Point,v3,test,460,0.904,0.030,2026-09-04
