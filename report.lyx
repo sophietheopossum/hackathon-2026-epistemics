@@ -618,6 +618,25 @@ In order to track the claims made by LLMs,
 \begin_inset Newline newline
 \end_inset
 
+The produced harness allows you to 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+As it was readily available,
+ Claude opus 5.5 was used as the LLM,
+ however with more time and resources,
+ a larger range of models could be tested.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
 Verifying the first sweep by hand turned up an auditor bug.
  It read CSV (Comma Separated Values) commas as thousands separators,
  which made real values look unanchored.
