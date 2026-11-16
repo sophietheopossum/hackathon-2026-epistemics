@@ -816,7 +816,7 @@ nolink "false"
 
 \begin_layout Standard
 \begin_inset Float table
-placement document
+placement h
 alignment document
 wide false
 sideways false
@@ -1193,7 +1193,7 @@ nolink "false"
 
 \begin_layout Standard
 \begin_inset Float table
-placement document
+placement h
 alignment document
 wide false
 sideways false
