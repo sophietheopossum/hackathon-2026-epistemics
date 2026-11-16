@@ -1751,12 +1751,21 @@ t fully address in the hackathon timeframe.
 
 \end_inset
 
-As there was no \SpecialChar LaTeX
-/\SpecialChar LyX
- template available,
- more time than I'd like was spent making my own template,
- which I feel unfairly impacted the quality of this paper and my overall work;
- I would be willing to provide my template so that future individuals don't experience this issue.
+The harness only sees tool calls that go through the MCP proxy:
+ a tool the agent can reach another way,
+ such as its own built-in file or web tools,
+ bypasses the log entirely.
+ In my experiment these were disabled,
+ but a real deployment would have to route every tool through the proxy.
+ The proxy and the tool servers are trusted:
+ the hash chain shows that the log was not edited afterwards,
+ but not that a tool returned correct output.
+ Unsupported claims are flagged rather than prevented;
+ an agent can still decline to cite,
+ and its claims are then simply labelled T3.
+ Quotations are matched word for word,
+ so a faithful paraphrase of a source cannot be checked.
+ Further limitations are listed in the appendix.
 \begin_inset Separator parbreak
 \end_inset
 
