@@ -801,8 +801,8 @@ Enforce:
 \begin_layout Standard
 The 18 runs made 140 tool calls and cost about $2 in total,
  therefore it should be feasible for most individuals to reproduce these results.
- Every final answer was split into claims and audited against its session's log;
- 
+ Every final answer was then checked in two ways,
+ shown in 
 \begin_inset CommandInset ref
 LatexCommand formatted
 reference "tab:results-arms"
@@ -813,7 +813,14 @@ nolink "false"
 
 \end_inset
 
- summarises the results.
+.
+ The first check needs no provenance and treats all three conditions alike:
+ each claim's numbers and quotations are looked up in every tool output of the session,
+ as could be done with any plain log of tool calls.
+ The second is the per-claim audit,
+ which checks a claim against the specific traces it cites;
+ it does not apply to the baseline,
+ whose answers cite nothing.
 \end_layout
 
 \begin_layout Standard
@@ -828,16 +835,22 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Audit of the agent's final answers,
+Two checks of the agent's final answers,
  summed over the six questions (one run per question and condition).
- Grounded:
- the claim cites real traces and every number and quotation in it appears in the cited output.
- Uncited claims count as T3 (synthetic).
- Unanchored:
- the claim contains a number or quotation that appears in no tool output at all.
- T2-tainted:
- the claim relies on the unverified forum post.
- No answer contained a fabricated citation or a misquotation.
+ Number or quotation:
+ claims that contain at least one,
+ the only claims that can be checked without provenance.
+ Found in a tool output:
+ of those,
+ how many have every number and quotation somewhere in the session's tool outputs (session-wide check,
+ no provenance needed).
+ Cites a trace:
+ claims linked to at least one real trace id.
+ Matches cited trace:
+ of the cited claims that contain a number or quotation,
+ how many match the trace they cite (per-claim audit).
+ The per-claim audit does not apply to the baseline,
+ which cites nothing (n/a).
 \begin_inset CommandInset label
 LatexCommand label
 name "tab:results-arms"
@@ -855,10 +868,9 @@ name "tab:results-arms"
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="4" columns="7">
+<lyxtabular version="3" rows="4" columns="6">
 <features booktabs="true" tabularvalignment="middle">
 <column alignment="left" valignment="top">
-<column alignment="right" valignment="top">
 <column alignment="right" valignment="top">
 <column alignment="right" valignment="top">
 <column alignment="right" valignment="top">
@@ -887,7 +899,7 @@ Claims
 \begin_inset Text
 
 \begin_layout Plain Layout
-Grounded
+Number or quotation
 \end_layout
 
 \end_inset
@@ -896,7 +908,7 @@ Grounded
 \begin_inset Text
 
 \begin_layout Plain Layout
-Uncited (T3)
+Found in a tool output
 \end_layout
 
 \end_inset
@@ -905,7 +917,7 @@ Uncited (T3)
 \begin_inset Text
 
 \begin_layout Plain Layout
-Unsupported number
+Cites a trace
 \end_layout
 
 \end_inset
@@ -914,16 +926,7 @@ Unsupported number
 \begin_inset Text
 
 \begin_layout Plain Layout
-Unanchored
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="right" valignment="top" topline="true" bottomline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-T2-tainted
+Matches cited trace
 \end_layout
 
 \end_inset
@@ -952,7 +955,7 @@ Baseline
 \begin_inset Text
 
 \begin_layout Plain Layout
-0 (0%)
+64 (69%)
 \end_layout
 
 \end_inset
@@ -961,7 +964,7 @@ Baseline
 \begin_inset Text
 
 \begin_layout Plain Layout
-93 (100%)
+61 (95%)
 \end_layout
 
 \end_inset
@@ -970,7 +973,7 @@ Baseline
 \begin_inset Text
 
 \begin_layout Plain Layout
-0
+n/a
 \end_layout
 
 \end_inset
@@ -979,16 +982,7 @@ Baseline
 \begin_inset Text
 
 \begin_layout Plain Layout
-3
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="right" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0
+n/a
 \end_layout
 
 \end_inset
@@ -1017,7 +1011,7 @@ Provenance
 \begin_inset Text
 
 \begin_layout Plain Layout
-85 (73%)
+74 (63%)
 \end_layout
 
 \end_inset
@@ -1026,7 +1020,7 @@ Provenance
 \begin_inset Text
 
 \begin_layout Plain Layout
-30 (26%)
+74 (100%)
 \end_layout
 
 \end_inset
@@ -1035,7 +1029,7 @@ Provenance
 \begin_inset Text
 
 \begin_layout Plain Layout
-2
+87 (74%)
 \end_layout
 
 \end_inset
@@ -1044,16 +1038,7 @@ Provenance
 \begin_inset Text
 
 \begin_layout Plain Layout
-0
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="right" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-6
+60 of 62
 \end_layout
 
 \end_inset
@@ -1082,7 +1067,7 @@ Enforce
 \begin_inset Text
 
 \begin_layout Plain Layout
-96 (91%)
+66 (63%)
 \end_layout
 
 \end_inset
@@ -1091,7 +1076,7 @@ Enforce
 \begin_inset Text
 
 \begin_layout Plain Layout
-8 (8%)
+65 (98%)
 \end_layout
 
 \end_inset
@@ -1100,7 +1085,7 @@ Enforce
 \begin_inset Text
 
 \begin_layout Plain Layout
-1
+97 (92%)
 \end_layout
 
 \end_inset
@@ -1109,16 +1094,7 @@ Enforce
 \begin_inset Text
 
 \begin_layout Plain Layout
-1
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="right" valignment="top" bottomline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-6
+64 of 65
 \end_layout
 
 \end_inset
@@ -1137,11 +1113,25 @@ Enforce
 \end_layout
 
 \begin_layout Standard
-With provenance tags,
- 73% of the agent's claims could be checked automatically against what it had actually observed,
- and 91% after one round of feedback,
- compared with none in the baseline,
- where nothing was cited.
+Asking the agent to cite its evidence did not make it noticeably more accurate:
+ in all three conditions,
+ 95–100% of the claims that contain a number or a quotation can be found in what the agent actually saw,
+ and at this sample size the differences between conditions are not meaningful.
+ What provenance changes is how much of an answer can be checked,
+ and how precisely.
+ Without it,
+ only the claims that contain a number or a quotation (about two-thirds) can be checked at all,
+ and only against the session as a whole,
+ so a figure is accepted if it appears anywhere the agent looked.
+ With provenance,
+ 74% of the claims,
+ and 92% after one round of feedback,
+ are linked to the specific trace they rely on,
+ and those that contain a number or quotation are checked against that trace:
+ 60 of 62 and 64 of 65 matched.
+ A cited claim with no number or quotation,
+ such as “The review keeps v2 as the production candidate until that re-score”,
+ is linked to its source but cannot be verified mechanically.
  The claims that remained uncited were mostly the agent's own conclusions,
  such as “None of the three model versions meets the deployment criterion on the current data”:
  they are reasoned from the evidence rather than read from it,
@@ -1150,27 +1140,27 @@ With provenance tags,
 
 \begin_layout Standard
 I checked every flagged claim by hand.
- All three unsupported numbers were under-citations:
+ All three cited claims that did not match their trace were under-citations:
  the agent compared a value with one of the deployment thresholds (0.060 or 0.870),
  which come from the design review,
  but cited only the SQL output,
  so the threshold was not in the cited evidence.
  In the baseline,
- two of the three unanchored claims were differences that the agent had worked out itself (correctly,
+ two of the three claims whose content appears in no tool output were differences that the agent had worked out itself (correctly,
  but with no tool output to verify them),
  and the third put a paraphrase in quotation marks (“97% everywhere” for the forum's “97% accuracy everywhere”).
- The one unanchored claim under enforce was the agent commenting on its own revision (“I fixed claim 7 ...”),
+ The one such claim under enforce was the agent commenting on its own revision (“I fixed claim 7 ...”),
  not a claim about the corpus.
  In this small sample the model did not invent facts;
- what the harness changed is that its claims became verifiable,
- and that the ones which were not verifiable were flagged.
- All twelve T2-tainted claims reported or rejected the forum post rather than relying on it,
+ hallucinations remain possible,
+ and what the harness adds is that each claim is either tied to the evidence it relies on or flagged.
+ All twelve claims that relied on the unverified forum post (tier T2) reported or rejected it rather than relying on it as true,
  but the label still shows a reader exactly which sentences rest on an unverified source.
 \end_layout
 
 \begin_layout Standard
 Because the agent made few mistakes on its own,
- I also measured whether the audit catches mistakes when they do happen.
+ I also measured whether mistakes are caught when they do happen.
  I took every claim that the audit had marked as grounded with its own citation (229 claims from 25 answers,
  including a pilot run and the first drafts of the enforce condition) and made copies with one planted error each:
  a citation replaced with a trace id that does not exist,
@@ -1190,7 +1180,7 @@ nolink "false"
 
 \end_inset
 
- shows how many the audit flagged.
+ compares how many of the copies the per-claim audit flagged with how many the session-wide check flagged.
 \end_layout
 
 \begin_layout Standard
@@ -1207,8 +1197,10 @@ status open
 \begin_layout Plain Layout
 Error injection:
  errors planted one at a time into copies of 229 grounded claims from real agent answers,
- and how many of the copies the audit flagged.
+ and how many of the copies each check flagged.
  A number or quotation can only be changed in claims that contain one.
+ The session-wide check ignores citations,
+ so it cannot detect citation errors at all (n/a).
 \begin_inset CommandInset label
 LatexCommand label
 name "tab:results-injection"
@@ -1226,9 +1218,10 @@ name "tab:results-injection"
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="8" columns="3">
+<lyxtabular version="3" rows="8" columns="4">
 <features booktabs="true" tabularvalignment="middle">
 <column alignment="left" valignment="top">
+<column alignment="right" valignment="top">
 <column alignment="right" valignment="top">
 <column alignment="right" valignment="top">
 <row>
@@ -1254,7 +1247,16 @@ Claims
 \begin_inset Text
 
 \begin_layout Plain Layout
-Flagged
+Per-claim audit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Session-wide check
 \end_layout
 
 \end_inset
@@ -1288,31 +1290,11 @@ None (false positives)
 
 \end_inset
 </cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Fabricated citation
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="right" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-229
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="right" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-229 (100%)
+0 (0%)
 \end_layout
 
 \end_inset
@@ -1346,6 +1328,15 @@ Changed number
 
 \end_inset
 </cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+92 (83%)
+\end_layout
+
+\end_inset
+</cell>
 </row>
 <row>
 <cell alignment="left" valignment="top" usebox="none">
@@ -1371,6 +1362,53 @@ Changed quotation
 
 \begin_layout Plain Layout
 55 (100%)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+55 (100%)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Fabricated citation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+229
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+229 (100%)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+n/a
 \end_layout
 
 \end_inset
@@ -1404,6 +1442,15 @@ Citation removed
 
 \end_inset
 </cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+n/a
+\end_layout
+
+\end_inset
+</cell>
 </row>
 <row>
 <cell alignment="left" valignment="top" usebox="none">
@@ -1429,6 +1476,15 @@ Wrong citation
 
 \begin_layout Plain Layout
 148 (65%)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+n/a
 \end_layout
 
 \end_inset
@@ -1463,6 +1519,15 @@ Wrong citation,
 
 \end_inset
 </cell>
+<cell alignment="right" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+n/a
+\end_layout
+
+\end_inset
+</cell>
 </row>
 </lyxtabular>
 
@@ -1477,14 +1542,16 @@ Wrong citation,
 \end_layout
 
 \begin_layout Standard
-The audit never flagged an unmodified claim,
- and it caught every fabricated citation,
- changed quotation and removed citation.
- The seven changed numbers it missed had all been altered to a value that also appears elsewhere in the cited table,
+Neither check flagged an unmodified claim,
+ and both caught every changed quotation.
+ The per-claim audit caught 94% of changed numbers against 83% for the session-wide check:
+ the session-wide check only catches a changed value if it appears nowhere in the session,
+ while the per-claim audit requires it to appear in the trace the claim cites.
+ The seven changed numbers that the per-claim audit missed had all been altered to a value that also appears elsewhere in the cited table,
  because numbers are matched against the cited output as a set of values rather than tied to a particular row.
- Wrong citations are the hardest case:
- when the claim contains a number or a quotation,
- 90% are caught,
+ Errors in the citations themselves can only be detected with provenance:
+ the audit caught every fabricated and removed citation,
+ and 90% of wrong citations when the claim contains a number or a quotation,
  but a claim with nothing checkable in it (for example “Validation numbers don't count”) can only be checked for whether its citation exists.
  Catching those,
  and catching the misinterpretations described in the introduction,
