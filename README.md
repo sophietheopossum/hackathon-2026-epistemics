@@ -2,6 +2,7 @@
 
 **Epistemic Taint Tracking: Tracing LLM Agent Claims Back to Their Tool-Call Evidence**
 (Apart Research AI x Epistemics Research Sprint, November 2026; the write-up is `report.lyx`).
+All code in this repository was written during the sprint; there is no pre-existing code.
 
 `epistaint` stops an agent from disguising a guess as a verified fact. It does not try to make
 the model hallucinate less; it records, outside the model's control, what the agent actually
