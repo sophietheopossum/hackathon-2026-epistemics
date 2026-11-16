@@ -797,7 +797,8 @@ Enforce:
 \end_layout
 
 \begin_layout Standard
-The 18 runs made 140 tool calls and cost about $2 in total.
+The 18 runs made 140 tool calls and cost about $2 in total,
+ therefore it should be feasible for most individuals to reproduce these results.
  Every final answer was split into claims and audited against its session's log;
  
 \begin_inset CommandInset ref
