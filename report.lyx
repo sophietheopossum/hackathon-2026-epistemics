@@ -463,7 +463,17 @@ re addressing;
 
 \end_inset
 
-
+Large Language Models (LLMs) are often used for general queries as well as research,
+ gaining popularity due to the ability to effectively search for information using natural language.
+ Such advancements can make research quicker and easier than ever,
+ however it is important that the research generated is factually accurate.
+ Whilst most modern LLM models perform quite well when it comes to being factually accurate,
+ to this day it is not unheard of for them to hallucinate false information,
+ or even,
+ much like humans,
+ misinterpret information and thus provide an answer that,
+ whilst being a correct answer in its original context,
+ is not a correct answer to the question they were asked.
 \begin_inset Separator parbreak
 \end_inset
 
