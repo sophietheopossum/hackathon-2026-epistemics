@@ -257,6 +257,8 @@ class Report:
             "grounded_rate": round(counts[GROUNDED] / n, 3),
             "violations": counts[FABRICATED] + counts[MISQUOTE] + counts[UNSUPPORTED],
             "uncited_attributable": sum(1 for c in uncited if c.attributable),
+            "uncited_checkable": sum(1 for c in uncited if c.attributable is not None),
+            "grounded_checked": sum(1 for c in self.claims if c.status == GROUNDED and c.checked),
             "uncited_unanchored_numbers": sum(1 for c in uncited if "unanchored-number" in " ".join(c.flags)),
             # comparable across arms, citations or not: claims with a number or quote that
             # appears in no tool output of the session at all
@@ -331,6 +333,14 @@ def audit(answer: str, traces: list[Trace], session: str = "") -> Report:
     return Report(session=session, claims=claims, integrity=verify_chain(traces))
 
 
+def session_check(answer: str, traces: list[Trace], session: str = "") -> Report:
+    """Baseline verifier without provenance: ignore any citations and look each claim's numbers
+    and quotations up in every tool output of the session - what a plain tool log allows.
+    Every claim comes back UNCITED; `attributable` says whether its content was found
+    (True), not found (False), or there was nothing to check (None)."""
+    return audit(strip_citations(answer), traces, session)
+
+
 # ------------------------------------------------------------------ render
 
 COLOURS = {
@@ -396,6 +406,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--json", action="store_true", help="print the report as JSON")
     ap.add_argument("--feedback", action="store_true", help="print a correction message for the agent")
     ap.add_argument("--strict", action="store_true", help="exit 1 if any claim is uncited")
+    ap.add_argument("--ignore-citations", action="store_true",
+                    help="baseline: check numbers and quotes against the whole session, ignoring citations")
     ap.add_argument("--no-colour", "--no-color", action="store_true")
     args = ap.parse_args(argv)
 
@@ -405,7 +417,8 @@ def main(argv: list[str] | None = None) -> int:
     if session is None:
         print("no traces in the store", file=sys.stderr)
         return 2
-    report = audit(answer, store.session_traces(session), session)
+    check = session_check if args.ignore_citations else audit
+    report = check(answer, store.session_traces(session), session)
     if args.json:
         print(json.dumps(report.to_json(), indent=2, ensure_ascii=False))
     elif args.feedback:

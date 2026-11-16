@@ -29,7 +29,8 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from .audit import CITE_RE, FABRICATED, GROUNDED, MISQUOTE, NUM_RE, QUOTE_RE, UNCITED, UNSUPPORTED, audit
+from .audit import (CITE_RE, FABRICATED, GROUNDED, MISQUOTE, NUM_RE, QUOTE_RE, UNCITED, UNSUPPORTED, audit,
+                    session_check)
 from .core import Store, Trace
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -100,7 +101,8 @@ def inject(runs_dir: Path, db: Path) -> dict:
             clean = audit(c.text, traces, session).claims
             rows.append({"session": session, "kind": "clean", "claim": c.text,
                          "status": clean[0].status if clean else "-", "detected": bool(clean) and clean[0].status != GROUNDED,
-                         "category_ok": None, "checkable": c.checked > 0})
+                         "category_ok": None, "checkable": c.checked > 0,
+                         "baseline_detected": baseline_flags(c.text, traces, session)})
             for kind in EXPECTED:
                 mutated = mutate(c.text, kind, traces)
                 if mutated is None or mutated == c.text:
@@ -109,19 +111,29 @@ def inject(runs_dir: Path, db: Path) -> dict:
                 status = res[0].status if res else "-"
                 rows.append({"session": session, "kind": kind, "claim": mutated, "status": status,
                              "detected": status != GROUNDED, "category_ok": status in EXPECTED[kind],
-                             "checkable": c.checked > 0})
+                             "checkable": c.checked > 0,
+                             "baseline_detected": baseline_flags(mutated, traces, session)})
     summary: dict[str, dict] = {}
     for kind in ["clean", *EXPECTED]:
         sel = [r for r in rows if r["kind"] == kind]
         det = sum(r["detected"] for r in sel)
-        summary[kind] = {"n": len(sel), "flagged": det, "rate": round(det / len(sel), 3) if sel else None,
-                         "right_category": sum(1 for r in sel if r["category_ok"]) if kind != "clean" else None}
+        summary[kind] = stats(sel)
+        summary[kind]["right_category"] = sum(1 for r in sel if r["category_ok"]) if kind != "clean" else None
         if kind == "swap":
-            chk = [r for r in sel if r["checkable"]]
-            summary["swap (checkable claims)"] = {
-                "n": len(chk), "flagged": sum(r["detected"] for r in chk),
-                "rate": round(sum(r["detected"] for r in chk) / len(chk), 3) if chk else None}
+            summary["swap (checkable claims)"] = stats([r for r in sel if r["checkable"]])
     return {"summary": summary, "rows": rows}
+
+
+def baseline_flags(claim: str, traces: list[Trace], session: str) -> bool:
+    """Would the session-wide check (no provenance) flag this claim?"""
+    return any(c.attributable is False for c in session_check(claim, traces, session).claims)
+
+
+def stats(sel: list[dict]) -> dict:
+    det, base = sum(r["detected"] for r in sel), sum(r["baseline_detected"] for r in sel)
+    n = len(sel)
+    return {"n": n, "flagged": det, "rate": round(det / n, 3) if n else None,
+            "baseline_flagged": base, "baseline_rate": round(base / n, 3) if n else None}
 
 
 def summary_row(meta: dict, s: dict) -> dict:
@@ -143,10 +155,17 @@ def reaudit(csv_path: Path, runs_dir: Path, db: Path) -> list[dict]:
             continue
         d = runs_dir / r["session"]
         answer = d / "answer.revised.md" if (d / "answer.revised.md").exists() else d / "answer.md"
-        report = audit(answer.read_text(), store.session_traces(r["session"]), r["session"])
+        traces = store.session_traces(r["session"])
+        text = answer.read_text()
+        report = audit(text, traces, r["session"])
+        base = session_check(text, traces, r["session"]).summary
         (d / "audit.json").write_text(json.dumps(report.to_json(), indent=2, ensure_ascii=False))
         meta = {k: r[k] for k in ("question", "q", "arm", "session", "seconds", "cost_usd", "revised")}
-        rows.append(summary_row(meta, report.summary))
+        row = summary_row(meta, report.summary)
+        row.update(grounded_checked=report.summary["grounded_checked"],
+                   sw_claims=base["claims"], sw_checkable=base["uncited_checkable"],
+                   sw_supported=base["uncited_attributable"])
+        rows.append(row)
     return rows
 
 
@@ -178,8 +197,17 @@ def agents(questions: list[str], arms: list[str], reps: int, jobs: int, runs_dir
 def table(rows: list[dict]) -> str:
     ok = [r for r in rows if "error" not in r]
     arms = sorted({r["arm"] for r in ok}, key=["baseline", "provenance", "enforce"].index)
-    lines = ["| arm | runs | claims | grounded | uncited (T3) | fabricated | misquote | unsupported number | unanchored claims | T2-tainted |",
-             "|---|---|---|---|---|---|---|---|---|---|"]
+    lines = []
+    if all("sw_claims" in r for r in ok):
+        lines += ["Session-wide check (no provenance; same for every arm):",
+                  "| arm | claims | with a number or quotation | ...found in some tool output |", "|---|---|---|---|"]
+        for arm in arms:
+            sel = [r for r in ok if r["arm"] == arm]
+            c, k, f = (sum(int(r[x]) for r in sel) for x in ("sw_claims", "sw_checkable", "sw_supported"))
+            lines.append(f"| {arm} | {c} | {k} ({k / c:.0%}) | {f} ({f / k:.0%}) |")
+        lines += ["", "Per-claim provenance audit:"]
+    lines += ["| arm | runs | claims | grounded | uncited (T3) | fabricated | misquote | unsupported number | unanchored claims | T2-tainted |",
+              "|---|---|---|---|---|---|---|---|---|---|"]
     for arm in arms:
         sel = [r for r in ok if r["arm"] == arm]
         tot = {k: sum(int(r[k]) for r in sel) for k in ["claims", "grounded", "uncited", "fabricated", "misquote",
@@ -212,12 +240,13 @@ def main(argv: list[str] | None = None) -> int:
         res = inject(args.runs_dir, args.db)
         out = args.runs_dir / f"inject-{stamp}.json"
         out.write_text(json.dumps(res, indent=2, ensure_ascii=False))
-        print("| planted error | n | flagged | detection rate | expected verdict |\n|---|---|---|---|---|")
+        print("| planted error | n | epistaint flagged | session-wide check flagged | expected verdict |\n|---|---|---|---|---|")
         for kind, s in res["summary"].items():
             label = "none (clean claim; flagged = false positive)" if kind == "clean" else kind
             rate = "-" if s["rate"] is None else f"{s['rate']:.0%}"
+            brate = "-" if s["baseline_rate"] is None else f"{s['baseline_rate']:.0%}"
             cat = "-" if s.get("right_category") is None else str(s["right_category"])
-            print(f"| {label} | {s['n']} | {s['flagged']} | {rate} | {cat} |")
+            print(f"| {label} | {s['n']} | {s['flagged']} ({rate}) | {s['baseline_flagged']} ({brate}) | {cat} |")
         print(f"\n(details: {out})")
         return 0
 
