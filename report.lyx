@@ -606,7 +606,11 @@ t work?
 
 \end_inset
 
-
+In order to track the claims made by LLMs,
+ I created a python harness that traces every claim and ensures that they all can be traced to accurately referenced citations.
+ The goal is not to prevent fabricated claims from being made,
+ but rather to flag them,
+ giving a hypothetical user the freedom to then decide what to do with the knowledge that information they were provided is not epistemically sound.
 \begin_inset Separator parbreak
 \end_inset
 
