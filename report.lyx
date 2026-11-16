@@ -626,17 +626,6 @@ The produced harness allows you to
 \begin_inset Newline newline
 \end_inset
 
-As it was readily available,
- Claude opus 5.5 was used as the LLM,
- however with more time and resources,
- a larger range of models could be tested.
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
 Verifying the first sweep by hand turned up an auditor bug.
  It read CSV (Comma Separated Values) commas as thousands separators,
  which made real values look unanchored.
@@ -717,11 +706,793 @@ Ensure text in figures is legible!
 \end_deeper
 \end_inset
 
-
+To test the harness,
+ I gave an agent six questions about a small,
+ fictional research corpus:
+ the field-trial notes and results table of an invented bird-call classifier,
+ “Project Kestrel”,
+ with three model versions (v1 to v3) evaluated at four sites.
+ Because the corpus is fictional,
+ the agent cannot answer from its training data,
+ so any claim that no tool output supports is unsupported by construction.
+ The corpus also contains traps:
+ an unverified forum post claiming that v3 gets “97% accuracy everywhere”,
+ validation results next to the test results that the deployment criterion actually uses,
+ a site score that the trial lead says should not be trusted,
+ and a question that the corpus cannot answer.
+ The six questions were:
 \begin_inset Separator parbreak
 \end_inset
 
 
+\end_layout
+
+\begin_layout Enumerate
+Does any model version meet the deployment criterion from the design review?
+ Give the numbers that decide it.
+\end_layout
+
+\begin_layout Enumerate
+What accuracy does the v3 model achieve?
+\end_layout
+
+\begin_layout Enumerate
+How many recordings were lost at Ashby Fen,
+ when,
+ and why?
+\end_layout
+
+\begin_layout Enumerate
+Compare the false positive rates of v2 and v3 at Ashby Moor on the test split,
+ and explain the difference.
+\end_layout
+
+\begin_layout Enumerate
+What did the design review decide about each model version,
+ and who said “No model ships on validation numbers alone”?
+\end_layout
+
+\begin_layout Enumerate
+Is the v3 classifier head worth its extra inference cost on the field hardware?
+\end_layout
+
+\begin_layout Standard
+The agent was Claude Opus 5.5 running in Claude Code in headless mode,
+ with its built-in tools disabled,
+ so that the only way it could gather evidence was through the corpus tools behind the proxy.
+ This model was chosen as it was readily available,
+ however with more time and resources a larger range of models could be tested.
+ Each question was asked once under each of three conditions:
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Baseline:
+
+\series default
+ the proxy logged every tool call but did not tag the results,
+ and the prompt did not ask for citations.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Provenance:
+
+\series default
+ every result was tagged with its trace id,
+ and the prompt asked for every factual sentence to cite the trace ids it relies on.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Enforce:
+
+\series default
+ as provenance,
+ but the audit's feedback was sent back to the agent once,
+ and its revised answer was scored.
+\end_layout
+
+\begin_layout Standard
+The 18 runs made 140 tool calls and cost about $2 in total.
+ Every final answer was split into claims and audited against its session's log;
+ 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "tab:results-arms"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ summarises the results.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement document
+alignment document
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Audit of the agent's final answers,
+ summed over the six questions (one run per question and condition).
+ Grounded:
+ the claim cites real traces and every number and quotation in it appears in the cited output.
+ Uncited claims count as T3 (synthetic).
+ Unanchored:
+ the claim contains a number or quotation that appears in no tool output at all.
+ T2-tainted:
+ the claim relies on the unverified forum post.
+ No answer contained a fabricated citation or a misquotation.
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:results-arms"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="7">
+<features booktabs="true" tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="right" valignment="top">
+<column alignment="right" valignment="top">
+<column alignment="right" valignment="top">
+<column alignment="right" valignment="top">
+<column alignment="right" valignment="top">
+<column alignment="right" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Condition
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Claims
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Grounded
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Uncited (T3)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Unsupported number
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Unanchored
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+T2-tainted
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Baseline
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+93
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (0%)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+93 (100%)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Provenance
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+117
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+85 (73%)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+30 (26%)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Enforce
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+105
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+96 (91%)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8 (8%)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+With provenance tags,
+ 73% of the agent's claims could be checked automatically against what it had actually observed,
+ and 91% after one round of feedback,
+ compared with none in the baseline,
+ where nothing was cited.
+ The claims that remained uncited were mostly the agent's own conclusions,
+ such as “None of the three model versions meets the deployment criterion on the current data”:
+ they are reasoned from the evidence rather than read from it,
+ and the audit labels them T3 instead of letting them pass as verified.
+\end_layout
+
+\begin_layout Standard
+I checked every flagged claim by hand.
+ All three unsupported numbers were under-citations:
+ the agent compared a value with one of the deployment thresholds (0.060 or 0.870),
+ which come from the design review,
+ but cited only the SQL output,
+ so the threshold was not in the cited evidence.
+ In the baseline,
+ two of the three unanchored claims were differences that the agent had worked out itself (correctly,
+ but with no tool output to verify them),
+ and the third put a paraphrase in quotation marks (“97% everywhere” for the forum's “97% accuracy everywhere”).
+ The one unanchored claim under enforce was the agent commenting on its own revision (“I fixed claim 7 ...”),
+ not a claim about the corpus.
+ In this small sample the model did not invent facts;
+ what the harness changed is that its claims became verifiable,
+ and that the ones which were not verifiable were flagged.
+ All twelve T2-tainted claims reported or rejected the forum post rather than relying on it,
+ but the label still shows a reader exactly which sentences rest on an unverified source.
+\end_layout
+
+\begin_layout Standard
+Because the agent made few mistakes on its own,
+ I also measured whether the audit catches mistakes when they do happen.
+ I took every claim that the audit had marked as grounded with its own citation (229 claims from 25 answers,
+ including a pilot run and the first drafts of the enforce condition) and made copies with one planted error each:
+ a citation replaced with a trace id that does not exist,
+ one digit of one number changed,
+ one word of one quotation changed,
+ the citations removed,
+ or the citation swapped for a different,
+ real trace from the same session.
+ 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "tab:results-injection"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ shows how many the audit flagged.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement document
+alignment document
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Error injection:
+ errors planted one at a time into copies of 229 grounded claims from real agent answers,
+ and how many of the copies the audit flagged.
+ A number or quotation can only be changed in claims that contain one.
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:results-injection"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="8" columns="3">
+<features booktabs="true" tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="right" valignment="top">
+<column alignment="right" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Planted error
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Claims
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Flagged
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+None (false positives)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+229
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (0%)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Fabricated citation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+229
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+229 (100%)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Changed number
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+111
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+104 (94%)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Changed quotation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+55
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+55 (100%)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Citation removed
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+229
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+229 (100%)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Wrong citation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+229
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+148 (65%)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Wrong citation,
+ claim with a number or quotation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+164
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+148 (90%)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The audit never flagged an unmodified claim,
+ and it caught every fabricated citation,
+ changed quotation and removed citation.
+ The seven changed numbers it missed had all been altered to a value that also appears elsewhere in the cited table,
+ because numbers are matched against the cited output as a set of values rather than tied to a particular row.
+ Wrong citations are the hardest case:
+ when the claim contains a number or a quotation,
+ 90% are caught,
+ but a claim with nothing checkable in it (for example “Validation numbers don't count”) can only be checked for whether its citation exists.
+ Catching those,
+ and catching the misinterpretations described in the introduction,
+ would need a semantic check on top of the provenance log.
+\end_layout
+
+\begin_layout Standard
+Each question was asked once per condition,
+ with a single model and a small fictional corpus,
+ so these results show that the approach works as intended rather than measure how often it is needed in practice,
+ and I do not claim statistical significance.
 \end_layout
 
 \begin_layout Section
